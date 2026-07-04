@@ -61,6 +61,21 @@
   отпускание реплицируются через `@rpc("authority", "call_local")`
   (`request_grab`/`request_drop`), авторитет компонента наследуется от
   родителя в `_enter_tree()`.
+- `Components/TowComponent.gd` — сцепка между машинами: `PinJoint3D` между
+  своей `VehicleBody3D` и найденной рейкастом от `hitch_point` (тот же
+  RPC-паттерн, что и у `PhysicalGrabComponent`). Подключён в `VAZ2107.tscn`
+  (узел `HitchPoint` + `TowComponent`). **Известное ограничение**: физику
+  каждой машины симулирует только её собственный authority-пир (см.
+  `VehicleController.gd`), поэтому `PinJoint3D` между двумя машинами
+  корректно работает, только если у них общий authority — т.е. буксировка
+  обездвиженной (`_is_immobilized`) ничейной машины ок, а перехват машины,
+  которую в этот момент ведёт другой пир — не реализовано (нужен handoff
+  authority, которого тут нет).
+- `Components/CargoSlot.gd` — точка крепления груза на машине: тот же
+  RPC-паттерн `PinJoint3D`, что и у `PhysicalGrabComponent`/`TowComponent`,
+  `load_cargo(body)`/`unload_cargo()`. Подключён в `FordTransit.tscn` (узел
+  `CargoBed`). Кто и как решает переложить груз из рук игрока в слот —
+  контент-фаза, тут только сам слот.
 - `Entities/Props/` — тестовые `RigidBody3D`-префабы для проверки хвата:
   `EnergyDrinkCan.tscn` (Flash Up), `CherryCiderBottle.tscn`,
   `ProcessorBox.tscn` (Ryzen). У всех `continuous_cd = true` — защита от
