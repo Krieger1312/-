@@ -1,6 +1,8 @@
-[gd_scene load_steps=8 format=3]
+[gd_scene load_steps=10 format=3]
 
 [ext_resource type="Script" path="res://Vehicles/VehicleController.gd" id="1"]
+[ext_resource type="Script" path="res://Components/VehicleServicePoint.gd" id="2"]
+[ext_resource type="Script" path="res://Components/InteractableComponent.gd" id="3"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_1"]
 size = Vector3(0.7, 0.9, 1.9)
@@ -105,6 +107,13 @@ damping_relaxation = 0.6
 [node name="Mesh" type="MeshInstance3D" parent="RB"]
 transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, 0, 0, 0)
 mesh = SubResource("CylinderMesh_1")
+
+[node name="ServicePoint" type="Node" parent="."]
+script = ExtResource("2")
+
+[node name="InteractableComponent" type="Node" parent="ServicePoint"]
+script = ExtResource("3")
+prompt_text = "Repair & refuel"
 
 [node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="."]
 replication_config = SubResource("SceneReplicationConfig_1")

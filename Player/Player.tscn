@@ -1,6 +1,7 @@
-[gd_scene load_steps=5 format=3]
+[gd_scene load_steps=6 format=3]
 
 [ext_resource type="Script" path="res://Player/PlayerController.gd" id="1"]
+[ext_resource type="Script" path="res://Components/PhysicalGrabComponent.gd" id="2"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_1"]
 radius = 0.4
@@ -34,6 +35,9 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.6, 0)
 spring_length = 4.0
 
 [node name="Camera3D" type="Camera3D" parent="SpringArm3D"]
+
+[node name="PhysicalGrabComponent" type="Node3D" parent="."]
+script = ExtResource("2")
 
 [node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="."]
 replication_config = SubResource("SceneReplicationConfig_1")

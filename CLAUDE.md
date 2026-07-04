@@ -60,7 +60,25 @@
   `PinJoint3D` (не репарентинг — объект не теряет массу/коллизию). Захват/
   отпускание реплицируются через `@rpc("authority", "call_local")`
   (`request_grab`/`request_drop`), авторитет компонента наследуется от
-  родителя в `_enter_tree()`.
+  родителя в `_enter_tree()`. Подключён в `Player.tscn`.
+- `Components/VehicleServicePoint.gd` — простейшая точка ремонта/заправки:
+  `InteractableComponent`-ребёнок, при взаимодействии вызывает `repair()`/
+  `refuel()` у родительской машины. Подключён во все 4 машины напрямую
+  (не привязано к конкретной заправке/гаражу на карте — это контент-фаза).
+- Все компоненты (`InteractableComponent`, `PhysicalGrabComponent`,
+  `CargoSlot`, `TowComponent`, `VehicleController`) объявляют `class_name`,
+  чтобы можно было типизированно ссылаться на них из других скриптов
+  (например, `PlayerController` различает `InteractableComponent` и
+  `CargoSlot` под курсором). Из-за этого при первом запуске **обязательно**
+  нужно построить кэш глобальных классов (`godot --headless --editor
+  --import --quit`) — без него движок падает с "Could not find type X in
+  the current scope" при загрузке любой сцены, использующей эти типы;
+  headless `--check-only`/`--scene` смок-тесты этого не делают сами.
+- `Player/PlayerController.gd` теперь разруливает клавишу `interact`:
+  если в руках груз (держит `PhysicalGrabComponent`) — пытается положить
+  его в `CargoSlot`, на который смотрит игрок; иначе — либо вызывает
+  `InteractableComponent.interact()` у объекта под прицелом, либо (если
+  ни того, ни другого нет) пробует `toggle_grab()`.
 - `Components/TowComponent.gd` — сцепка между машинами: `PinJoint3D` между
   своей `VehicleBody3D` и найденной рейкастом от `hitch_point` (тот же
   RPC-паттерн, что и у `PhysicalGrabComponent`). Подключён в `VAZ2107.tscn`

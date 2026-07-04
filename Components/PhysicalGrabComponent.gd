@@ -1,3 +1,4 @@
+class_name PhysicalGrabComponent
 extends Node3D
 ## Lets its owner pick up a RigidBody3D in front of a camera and carry it
 ## with a PinJoint3D instead of reparenting it, so the object keeps its own
@@ -32,6 +33,10 @@ func _physics_process(_delta: float) -> void:
 
 func is_holding() -> bool:
 	return _grabbed_body != null
+
+
+func get_grabbed_body() -> RigidBody3D:
+	return _grabbed_body
 
 
 ## Grabs whatever the camera is looking at, or releases the held object.

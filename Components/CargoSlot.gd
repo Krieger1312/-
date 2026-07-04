@@ -1,3 +1,4 @@
+class_name CargoSlot
 extends Node3D
 ## Attach point for locking cargo onto a vehicle -- e.g. loading a prop
 ## released by a PhysicalGrabComponent into the Ford Transit's bed for

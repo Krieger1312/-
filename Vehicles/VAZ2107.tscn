@@ -1,7 +1,9 @@
-[gd_scene load_steps=9 format=3]
+[gd_scene load_steps=11 format=3]
 
 [ext_resource type="Script" path="res://Vehicles/VehicleController.gd" id="1"]
 [ext_resource type="Script" path="res://Components/TowComponent.gd" id="2"]
+[ext_resource type="Script" path="res://Components/VehicleServicePoint.gd" id="3"]
+[ext_resource type="Script" path="res://Components/InteractableComponent.gd" id="4"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_1"]
 size = Vector3(1.62, 1.1, 4.15)
@@ -112,6 +114,13 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.3, 2.15)
 [node name="TowComponent" type="Node3D" parent="."]
 script = ExtResource("2")
 hitch_point = NodePath("../HitchPoint")
+
+[node name="ServicePoint" type="Node" parent="."]
+script = ExtResource("3")
+
+[node name="InteractableComponent" type="Node" parent="ServicePoint"]
+script = ExtResource("4")
+prompt_text = "Repair & refuel"
 
 [node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="."]
 replication_config = SubResource("SceneReplicationConfig_1")

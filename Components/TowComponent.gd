@@ -1,3 +1,4 @@
+class_name TowComponent
 extends Node3D
 ## Lets its owning vehicle hitch a nearby immobilized VehicleBody3D and tow
 ## it with a PinJoint3D, mirroring PhysicalGrabComponent's grab/drop pattern.

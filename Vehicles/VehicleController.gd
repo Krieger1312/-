@@ -1,3 +1,4 @@
+class_name VehicleController
 extends VehicleBody3D
 ## Standalone car physics component, isolated from gameplay/network code.
 ## Driving feel (engine/steer/brake curves) adapted from the VehicleBody3D

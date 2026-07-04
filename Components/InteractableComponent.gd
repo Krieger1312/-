@@ -1,14 +1,15 @@
+class_name InteractableComponent
 extends Node
 ## Reusable interaction component. Attach as a child of any object to make
 ## it interactable without coupling that object to player or UI code.
 ## Communicates only through its own signals and EventBus.
 
-@export var prompt_text: String = "Interact"
-@export var interaction_range: float = 2.0
-
 signal on_interact(interactor: Node)
 signal on_focus(interactor: Node)
 signal on_unfocus(interactor: Node)
+
+@export var prompt_text: String = "Interact"
+@export var interaction_range: float = 2.0
 
 
 ## Called by whatever detects focus (e.g. a player's interaction raycast).
