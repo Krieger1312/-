@@ -1,4 +1,4 @@
-[gd_scene load_steps=11 format=3]
+[gd_scene load_steps=14 format=3]
 
 [ext_resource type="Script" path="res://Vehicles/VehicleController.gd" id="1"]
 [ext_resource type="Script" path="res://Components/TowComponent.gd" id="2"]
@@ -6,10 +6,28 @@
 [ext_resource type="Script" path="res://Components/InteractableComponent.gd" id="4"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_1"]
-size = Vector3(1.62, 1.1, 4.15)
+size = Vector3(1.62, 1.45, 4.15)
 
-[sub_resource type="BoxMesh" id="BoxMesh_1"]
-size = Vector3(1.62, 1.1, 4.15)
+[sub_resource type="StandardMaterial3D" id="MatBody"]
+albedo_color = Color(0.82, 0.79, 0.68, 1.0)
+
+[sub_resource type="StandardMaterial3D" id="MatCabin"]
+albedo_color = Color(0.12, 0.14, 0.16, 1.0)
+
+[sub_resource type="StandardMaterial3D" id="MatBumper"]
+albedo_color = Color(0.08, 0.08, 0.09, 1.0)
+
+[sub_resource type="BoxMesh" id="MeshLowerBody"]
+size = Vector3(1.62, 0.85, 4.15)
+material = SubResource("MatBody")
+
+[sub_resource type="BoxMesh" id="MeshCabin"]
+size = Vector3(1.3, 0.6, 2.05)
+material = SubResource("MatCabin")
+
+[sub_resource type="BoxMesh" id="MeshBumper"]
+size = Vector3(1.5, 0.25, 0.15)
+material = SubResource("MatBumper")
 
 [sub_resource type="CylinderMesh" id="CylinderMesh_1"]
 top_radius = 0.29
@@ -37,12 +55,24 @@ engine_power = 1050.0
 brake_power = 840.0
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.55, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.725, 0)
 shape = SubResource("BoxShape3D_1")
 
-[node name="CarBody" type="MeshInstance3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.55, 0)
-mesh = SubResource("BoxMesh_1")
+[node name="LowerBody" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.425, 0)
+mesh = SubResource("MeshLowerBody")
+
+[node name="Cabin" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.15, 0)
+mesh = SubResource("MeshCabin")
+
+[node name="FrontBumper" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.25, -2.15)
+mesh = SubResource("MeshBumper")
+
+[node name="RearBumper" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.25, 2.15)
+mesh = SubResource("MeshBumper")
 
 [node name="LF" type="VehicleWheel3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.68, 0.29, -1.21)
