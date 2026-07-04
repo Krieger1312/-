@@ -1,4 +1,4 @@
-[gd_scene load_steps=25 format=3]
+[gd_scene load_steps=28 format=3]
 
 [ext_resource type="Script" path="res://Maps/OsmMapBuilder.gd" id="1"]
 [ext_resource type="Script" path="res://Maps/ForestScatter.gd" id="2"]
@@ -69,6 +69,20 @@ size = Vector3(4, 2.5, 4)
 size = Vector3(4, 2.5, 4)
 material = SubResource("MatShop")
 
+[sub_resource type="ProceduralSkyMaterial" id="SkyMaterial"]
+sky_top_color = Color(0.38, 0.55, 0.82, 1.0)
+sky_horizon_color = Color(0.75, 0.8, 0.85, 1.0)
+ground_bottom_color = Color(0.3, 0.29, 0.26, 1.0)
+ground_horizon_color = Color(0.75, 0.8, 0.85, 1.0)
+
+[sub_resource type="Sky" id="Sky"]
+sky_material = SubResource("SkyMaterial")
+
+[sub_resource type="Environment" id="Environment"]
+background_mode = 2
+sky = SubResource("Sky")
+ambient_light_energy = 0.6
+
 [sub_resource type="BoxShape3D" id="ShapeGarageSlab"]
 size = Vector3(6, 0.2, 8)
 
@@ -91,6 +105,13 @@ size = Vector3(6, 3, 0.2)
 material = SubResource("MatGarage")
 
 [node name="NovozybkovGreybox" type="Node3D"]
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment")
+
+[node name="Sun" type="DirectionalLight3D" parent="."]
+transform = Transform3D(0.707, -0.5, 0.5, 0, 0.707, 0.707, -0.707, -0.5, 0.5, 0, 20, 0)
+shadow_enabled = true
 
 [node name="OsmMapBuilder" type="Node3D" parent="."]
 script = ExtResource("1")
