@@ -80,8 +80,8 @@ func _hitch(vehicle: VehicleBody3D) -> void:
 	_towed_vehicle = vehicle
 
 	_joint = PinJoint3D.new()
-	_joint.bias = joint_bias
-	_joint.damping = joint_damping
+	_joint.set_param(PinJoint3D.PARAM_BIAS, joint_bias)
+	_joint.set_param(PinJoint3D.PARAM_DAMPING, joint_damping)
 	add_child(_joint)
 	_joint.global_position = hitch_point.global_position
 	_joint.node_a = get_parent().get_path()

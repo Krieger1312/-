@@ -10,9 +10,18 @@ const DEFAULT_PORT: int = 7777
 const MAX_PLAYERS: int = 16
 const MAX_NICK_LENGTH: int = 24
 const MAX_ADDRESS_LENGTH: int = 253
+const SCOOTER_TYPES: Array[String] = ["vortex", "escooter"]
 
 var connected_players: Dictionary = {} # peer_id (int) -> player_name (String)
 
+## Which of the two personal scooters (Stels Vortex / electric kick scooter)
+## each of the first two connected peers starts next to this session,
+## peer_id (int) -> "vortex"/"escooter". Rolled once per hosting session
+## (see host_game()) so it's random which peer gets which each time, not a
+## fixed assignment. Peers beyond the first two get no personal scooter.
+var scooter_assignment: Dictionary = {}
+
+var _scooter_pool: Array[String] = []
 var _pending_nickname: String = "Player"
 
 
@@ -32,9 +41,12 @@ func host_game(nickname: String = "Host", port: int = DEFAULT_PORT) -> Error:
 		push_error("NetworkManager: failed to host on port %d (error %d)." % [port, err])
 		return err
 	multiplayer.multiplayer_peer = peer
+	_scooter_pool = SCOOTER_TYPES.duplicate()
+	_scooter_pool.shuffle()
 	var host_id: int = multiplayer.get_unique_id()
 	connected_players[host_id] = _sanitize_nickname(nickname, "Host")
 	EventBus.player_connected.emit(host_id, connected_players[host_id])
+	_assign_and_broadcast_scooter(host_id)
 	return OK
 
 
@@ -100,6 +112,13 @@ func register_player(player_name: String) -> void:
 	for peer_id: int in connected_players:
 		_sync_roster_entry.rpc_id(sender_id, peer_id, connected_players[peer_id])
 	_sync_roster_entry.rpc(sender_id, sanitized)
+	# Separate from the roster sync above (and its "already have it" guard,
+	# which the joining client's own early self-registered entry would
+	# always trip) -- this is the only path that tells a client its own
+	# scooter assignment, so it can't be skipped that way.
+	for peer_id: int in scooter_assignment:
+		_broadcast_scooter_assignment.rpc_id(sender_id, peer_id, scooter_assignment[peer_id])
+	_assign_and_broadcast_scooter(sender_id)
 
 
 ## Authority-only RPC: replicates one roster entry to clients that don't have it yet.
@@ -109,6 +128,24 @@ func _sync_roster_entry(peer_id: int, player_name: String) -> void:
 		return
 	connected_players[peer_id] = player_name
 	EventBus.player_connected.emit(peer_id, player_name)
+
+
+## Rolls the next scooter off this session's shuffled pool for `peer_id`
+## (only the first two callers get one) and broadcasts it to every peer.
+func _assign_and_broadcast_scooter(peer_id: int) -> void:
+	if scooter_assignment.has(peer_id) or _scooter_pool.is_empty():
+		return
+	var scooter_type: String = _scooter_pool.pop_front()
+	_broadcast_scooter_assignment.rpc(peer_id, scooter_type)
+
+
+## call_local so the server (which is a peer too, and may itself be one of
+## the two assigned peers) applies its own broadcast instead of only ever
+## sending it to others.
+@rpc("authority", "call_local", "reliable")
+func _broadcast_scooter_assignment(peer_id: int, scooter_type: String) -> void:
+	scooter_assignment[peer_id] = scooter_type
+	EventBus.player_spawn_ready.emit(peer_id, scooter_type)
 
 
 func _sanitize_nickname(nickname: String, fallback: String) -> String:

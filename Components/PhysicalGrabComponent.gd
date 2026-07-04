@@ -5,6 +5,7 @@ extends Node3D
 ## collision shape and mass while held and reacts physically while carried.
 
 @export var camera: Camera3D
+@export var spring_arm: SpringArm3D
 @export var grab_range: float = 3.0
 @export var hold_distance: float = 2.0
 @export var collision_mask: int = 1
@@ -71,14 +72,23 @@ func drop() -> void:
 	_grabbed_body = null
 
 
+## Casts from the SpringArm3D's own (un-extended) anchor, not the Camera3D's
+## tip, for the same reason PlayerController._raycast_collider() does: the
+## chase-cam arm pulls the camera several meters behind and above the
+## player whenever unobstructed, which put anything within grab_range of
+## the player's actual body out of reach. Found the same way that bug was --
+## exercising the real interact-a-part-into-a-slot flow at a realistic
+## standing distance instead of calling toggle_grab()/install() directly.
 func _raycast_target() -> RigidBody3D:
 	if camera == null:
 		return null
+	var origin_node: Node3D = spring_arm if spring_arm else camera
 	var space_state: PhysicsDirectSpaceState3D = camera.get_world_3d().direct_space_state
-	var from: Vector3 = camera.global_position
-	var to: Vector3 = from - camera.global_transform.basis.z * grab_range
+	var from: Vector3 = origin_node.global_position
+	var to: Vector3 = from - origin_node.global_transform.basis.z * grab_range
 	var query: PhysicsRayQueryParameters3D = PhysicsRayQueryParameters3D.create(from, to)
 	query.collision_mask = collision_mask
+	query.exclude = [get_parent().get_rid()]
 	var result: Dictionary = space_state.intersect_ray(query)
 	var body: Variant = result.get("collider")
 	return body if body is RigidBody3D else null
@@ -89,8 +99,8 @@ func _grab(body: RigidBody3D) -> void:
 	_anchor.global_position = _hold_position()
 
 	_joint = PinJoint3D.new()
-	_joint.bias = joint_bias
-	_joint.damping = joint_damping
+	_joint.set_param(PinJoint3D.PARAM_BIAS, joint_bias)
+	_joint.set_param(PinJoint3D.PARAM_DAMPING, joint_damping)
 	add_child(_joint)
 	_joint.global_position = _anchor.global_position
 	_joint.node_a = _anchor.get_path()

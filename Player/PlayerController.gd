@@ -41,6 +41,7 @@ func _enter_tree() -> void:
 func _ready() -> void:
 	_camera.current = is_multiplayer_authority()
 	_grab_component.camera = _camera
+	_grab_component.spring_arm = _spring_arm
 	if is_multiplayer_authority():
 		Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 
@@ -157,10 +158,31 @@ func _handle_interact() -> void:
 
 func _try_load_held_into_slot() -> void:
 	var held: RigidBody3D = _grab_component.get_grabbed_body()
-	var slot: CargoSlot = _find_component(CargoSlot) as CargoSlot
+	var cargo_slot: CargoSlot = _find_component(CargoSlot) as CargoSlot
+	var part_slot: PartSlot = _find_matching_part_slot(held as CarPart) if held is CarPart else null
 	_grab_component.toggle_grab()
-	if slot and held and not slot.is_loaded():
-		slot.load_cargo(held)
+	if cargo_slot and held and not cargo_slot.is_loaded():
+		cargo_slot.load_cargo(held)
+	elif part_slot:
+		part_slot.install(held as CarPart)
+
+
+## Unlike _find_component, needs the matching predicate (right part_id, not
+## already filled) alongside the type check -- a disassembled car has
+## several PartSlot children at once (4 wheels + engine + battery), so
+## "first PartSlot found" isn't good enough once more than one is empty.
+func _find_matching_part_slot(part: CarPart) -> PartSlot:
+	var body: Variant = _raycast_collider()
+	if body == null:
+		return null
+	var queue: Array[Node] = [body as Node]
+	while not queue.is_empty():
+		var node: Node = queue.pop_front()
+		for child in node.get_children():
+			if child is PartSlot and child.accepts(part):
+				return child
+			queue.append(child)
+	return null
 
 
 ## Breadth-first so a component closer to the raycasted body's root wins

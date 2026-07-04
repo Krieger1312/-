@@ -1,0 +1,62 @@
+[gd_scene load_steps=8 format=3]
+
+[ext_resource type="Script" path="res://Vehicles/VAZ2107Frame.gd" id="1"]
+[ext_resource type="Script" path="res://Components/PartSlot.gd" id="2"]
+[ext_resource type="Script" path="res://Components/InteractableComponent.gd" id="3"]
+[ext_resource type="PackedScene" path="res://Vehicles/VAZ2107.tscn" id="4"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_1"]
+size = Vector3(1.62, 1.45, 4.15)
+
+[sub_resource type="StandardMaterial3D" id="MatBody"]
+albedo_color = Color(0.82, 0.79, 0.68, 1.0)
+
+[sub_resource type="BoxMesh" id="MeshLowerBody"]
+size = Vector3(1.62, 0.85, 4.15)
+material = SubResource("MatBody")
+
+[node name="VAZ2107Frame" type="StaticBody3D"]
+script = ExtResource("1")
+assembled_scene = ExtResource("4")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.725, 0)
+shape = SubResource("BoxShape3D_1")
+
+[node name="LowerBody" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.425, 0)
+mesh = SubResource("MeshLowerBody")
+
+[node name="WheelSlotLF" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.68, 0.29, -1.21)
+script = ExtResource("2")
+part_id = "wheel"
+
+[node name="WheelSlotRF" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.68, 0.29, -1.21)
+script = ExtResource("2")
+part_id = "wheel"
+
+[node name="WheelSlotLB" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.66, 0.29, 1.21)
+script = ExtResource("2")
+part_id = "wheel"
+
+[node name="WheelSlotRB" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.66, 0.29, 1.21)
+script = ExtResource("2")
+part_id = "wheel"
+
+[node name="EngineSlot" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.6, -1.5)
+script = ExtResource("2")
+part_id = "engine"
+
+[node name="BatterySlot" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.4, 0.9, -1.3)
+script = ExtResource("2")
+part_id = "battery"
+
+[node name="InteractableComponent" type="Node" parent="."]
+script = ExtResource("3")
+prompt_text = "Assemble VAZ-2107 (0/6 parts)"

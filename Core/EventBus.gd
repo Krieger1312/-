@@ -6,6 +6,10 @@ extends Node
 signal player_connected(peer_id: int, player_name: String)
 ## Emitted by NetworkManager when a player disconnects.
 signal player_disconnected(peer_id: int)
+## Emitted by NetworkManager once a peer's personal scooter/kick-scooter
+## assignment (random, see NetworkManager.scooter_assignment) is known --
+## the earliest point a spawner can place that peer's Player at the right spot.
+signal player_spawn_ready(peer_id: int, scooter_type: String)
 ## Emitted by TimeServer every tick with the current in-game hour.
 signal time_updated(current_hour: float)
 ## Emitted by an InteractableComponent when it gains focus.

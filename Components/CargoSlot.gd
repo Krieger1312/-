@@ -50,8 +50,8 @@ func _lock(body: RigidBody3D) -> void:
 	_cargo = body
 
 	_joint = PinJoint3D.new()
-	_joint.bias = joint_bias
-	_joint.damping = joint_damping
+	_joint.set_param(PinJoint3D.PARAM_BIAS, joint_bias)
+	_joint.set_param(PinJoint3D.PARAM_DAMPING, joint_damping)
 	add_child(_joint)
 	_joint.global_position = global_position
 	_joint.node_a = get_parent().get_path()

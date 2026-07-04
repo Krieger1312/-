@@ -1,4 +1,4 @@
-[gd_scene load_steps=16 format=3]
+[gd_scene load_steps=25 format=3]
 
 [ext_resource type="Script" path="res://Maps/OsmMapBuilder.gd" id="1"]
 [ext_resource type="Script" path="res://Maps/ForestScatter.gd" id="2"]
@@ -6,6 +6,14 @@
 [ext_resource type="Script" path="res://Maps/DeliveryQuest.gd" id="4"]
 [ext_resource type="PackedScene" path="res://Entities/Props/EnergyDrinkCan.tscn" id="5"]
 [ext_resource type="PackedScene" path="res://Entities/Props/CherryCiderBottle.tscn" id="6"]
+[ext_resource type="PackedScene" path="res://Vehicles/VAZ2107Frame.tscn" id="7"]
+[ext_resource type="PackedScene" path="res://Entities/Props/CarParts/Wheel.tscn" id="8"]
+[ext_resource type="PackedScene" path="res://Entities/Props/CarParts/Engine.tscn" id="9"]
+[ext_resource type="PackedScene" path="res://Entities/Props/CarParts/Battery.tscn" id="10"]
+[ext_resource type="PackedScene" path="res://Vehicles/FordTransit.tscn" id="11"]
+[ext_resource type="PackedScene" path="res://Vehicles/StelsVortexScooter.tscn" id="12"]
+[ext_resource type="PackedScene" path="res://Vehicles/ElectricScooter.tscn" id="13"]
+[ext_resource type="Script" path="res://Maps/PlayerSpawner.gd" id="14"]
 
 [sub_resource type="StandardMaterial3D" id="MatGasStation"]
 albedo_color = Color(0.85, 0.25, 0.2, 1.0)
@@ -60,6 +68,27 @@ size = Vector3(4, 2.5, 4)
 [sub_resource type="BoxMesh" id="MeshShop"]
 size = Vector3(4, 2.5, 4)
 material = SubResource("MatShop")
+
+[sub_resource type="BoxShape3D" id="ShapeGarageSlab"]
+size = Vector3(6, 0.2, 8)
+
+[sub_resource type="BoxMesh" id="MeshGarageSlab"]
+size = Vector3(6, 0.2, 8)
+material = SubResource("MatGarage")
+
+[sub_resource type="BoxShape3D" id="ShapeGarageWallX"]
+size = Vector3(0.2, 3, 8)
+
+[sub_resource type="BoxMesh" id="MeshGarageWallX"]
+size = Vector3(0.2, 3, 8)
+material = SubResource("MatGarage")
+
+[sub_resource type="BoxShape3D" id="ShapeGarageWallZ"]
+size = Vector3(6, 3, 0.2)
+
+[sub_resource type="BoxMesh" id="MeshGarageWallZ"]
+size = Vector3(6, 3, 0.2)
+material = SubResource("MatGarage")
 
 [node name="NovozybkovGreybox" type="Node3D"]
 
@@ -165,6 +194,84 @@ script = ExtResource("4")
 cargo = NodePath("../DeliveryCargo3")
 reward = 70
 
+[node name="HomeGarage" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -910.2, 0, -1635.1)
+
+[node name="Floor" type="StaticBody3D" parent="HomeGarage"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, 0)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="HomeGarage/Floor"]
+shape = SubResource("ShapeGarageSlab")
+
+[node name="Mesh" type="MeshInstance3D" parent="HomeGarage/Floor"]
+mesh = SubResource("MeshGarageSlab")
+
+[node name="Roof" type="StaticBody3D" parent="HomeGarage"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3, 0)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="HomeGarage/Roof"]
+shape = SubResource("ShapeGarageSlab")
+
+[node name="Mesh" type="MeshInstance3D" parent="HomeGarage/Roof"]
+mesh = SubResource("MeshGarageSlab")
+
+[node name="BackWall" type="StaticBody3D" parent="HomeGarage"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.9, 1.5, 0)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="HomeGarage/BackWall"]
+shape = SubResource("ShapeGarageWallX")
+
+[node name="Mesh" type="MeshInstance3D" parent="HomeGarage/BackWall"]
+mesh = SubResource("MeshGarageWallX")
+
+[node name="SideWallA" type="StaticBody3D" parent="HomeGarage"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, -3.9)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="HomeGarage/SideWallA"]
+shape = SubResource("ShapeGarageWallZ")
+
+[node name="Mesh" type="MeshInstance3D" parent="HomeGarage/SideWallA"]
+mesh = SubResource("MeshGarageWallZ")
+
+[node name="SideWallB" type="StaticBody3D" parent="HomeGarage"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 3.9)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="HomeGarage/SideWallB"]
+shape = SubResource("ShapeGarageWallZ")
+
+[node name="Mesh" type="MeshInstance3D" parent="HomeGarage/SideWallB"]
+mesh = SubResource("MeshGarageWallZ")
+
+[node name="VAZ2107Frame" parent="." instance=ExtResource("7")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -910.2, 0.2, -1633)
+
+[node name="LooseWheel1" parent="." instance=ExtResource("8")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -912, 0.3, -1636.5)
+
+[node name="LooseWheel2" parent="." instance=ExtResource("8")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -908.5, 0.3, -1636.5)
+
+[node name="LooseWheel3" parent="." instance=ExtResource("8")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -912, 0.3, -1638.5)
+
+[node name="LooseWheel4" parent="." instance=ExtResource("8")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -908.5, 0.3, -1638.5)
+
+[node name="LooseEngine" parent="." instance=ExtResource("9")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -910.2, 0.4, -1637.5)
+
+[node name="LooseBattery" parent="." instance=ExtResource("10")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -911, 0.3, -1634.5)
+
+[node name="FordTransit" parent="." instance=ExtResource("11")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -875.2, 1, -1635.1)
+
+[node name="StelsVortexScooter" parent="." instance=ExtResource("12")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -892.9, 1, -1618.7)
+
+[node name="ElectricScooter" parent="." instance=ExtResource("13")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -892.9, 1, -1650.7)
+
 [node name="PlayerSpawn" type="Node3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -894.9, 1, -1635.1)
 
@@ -179,3 +286,8 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -894.9, 1, -1618.7)
 
 [node name="ElectricScooterSpawn" type="Node3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -894.9, 1, -1650.7)
+
+[node name="PlayerSpawner" type="Node" parent="."]
+script = ExtResource("14")
+vortex_spawn_path = NodePath("../StelsVortexSpawn")
+escooter_spawn_path = NodePath("../ElectricScooterSpawn")
