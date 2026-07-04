@@ -1,9 +1,10 @@
-[gd_scene load_steps=15 format=3]
+[gd_scene load_steps=16 format=3]
 
 [ext_resource type="Script" path="res://Vehicles/VehicleController.gd" id="1"]
 [ext_resource type="Script" path="res://Components/CargoSlot.gd" id="2"]
 [ext_resource type="Script" path="res://Components/VehicleServicePoint.gd" id="3"]
 [ext_resource type="Script" path="res://Components/InteractableComponent.gd" id="4"]
+[ext_resource type="Script" path="res://Vehicles/VehicleSeat.gd" id="5"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_1"]
 size = Vector3(2.0, 1.8, 5.5)
@@ -148,6 +149,19 @@ mesh = SubResource("CylinderMesh_1")
 [node name="CargoBed" type="Node3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.0, 1.8)
 script = ExtResource("2")
+
+[node name="SpringArm3D" type="SpringArm3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.1, 0)
+spring_length = 6.5
+
+[node name="Camera3D" type="Camera3D" parent="SpringArm3D"]
+
+[node name="DriverSeat" type="Node" parent="."]
+script = ExtResource("5")
+
+[node name="InteractableComponent" type="Node" parent="DriverSeat"]
+script = ExtResource("4")
+prompt_text = "Enter vehicle"
 
 [node name="ServicePoint" type="Node" parent="."]
 script = ExtResource("3")

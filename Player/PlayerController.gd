@@ -1,3 +1,4 @@
+class_name PlayerController
 extends CharacterBody3D
 ## Networked player controller. Authority pattern adapted from
 ## devmoreir4/godot-3d-multiplayer-template: the node's name is the peer id,
@@ -12,11 +13,17 @@ const JUMP_VELOCITY: float = 7.5
 @export var interact_range: float = 3.0
 @export var interact_collision_mask: int = 1
 
+## The VehicleSeat currently riding us, or null when on foot. Set by
+## VehicleSeat itself via enter_vehicle()/exit_vehicle() -- see there for
+## why this isn't replicated to other peers yet.
+var current_seat: Node = null
+
 var _gravity: float = ProjectSettings.get_setting("physics/3d/default_gravity")
 
 @onready var _spring_arm: SpringArm3D = $SpringArm3D
 @onready var _camera: Camera3D = $SpringArm3D/Camera3D
 @onready var _grab_component: PhysicalGrabComponent = $PhysicalGrabComponent
+@onready var _collision_shape: CollisionShape3D = $CollisionShape3D
 
 
 func _enter_tree() -> void:
@@ -28,8 +35,34 @@ func _ready() -> void:
 	_grab_component.camera = _camera
 
 
+## Called by a VehicleSeat when we get in: hide, stop walking, and let the
+## seat's own camera take over. Disabling our own collision matters here --
+## a hidden-but-still-solid capsule left standing where the vehicle needs to
+## move would just block it.
+func enter_vehicle(seat: Node) -> void:
+	current_seat = seat
+	visible = false
+	_collision_shape.disabled = true
+	_camera.current = false
+
+
+## Called by a VehicleSeat when we get out: reappear at `exit_position` and
+## take our own camera back.
+func exit_vehicle(exit_position: Vector3) -> void:
+	current_seat = null
+	global_position = exit_position
+	visible = true
+	_collision_shape.disabled = false
+	_camera.current = is_multiplayer_authority()
+
+
 func _physics_process(delta: float) -> void:
 	if not is_multiplayer_authority():
+		return
+
+	if current_seat != null:
+		if Input.is_action_just_pressed("interact"):
+			current_seat.exit()
 		return
 
 	if not is_on_floor():
@@ -82,13 +115,21 @@ func _try_load_held_into_slot() -> void:
 		slot.load_cargo(held)
 
 
+## Breadth-first so a component closer to the raycasted body's root wins
+## over one nested deeper (e.g. a vehicle's direct Seat before its
+## ServicePoint/InteractableComponent) -- searches the whole subtree, not
+## just direct children, since components are often wrapped in a holder node.
 func _find_component(component_script: Script) -> Node:
 	var body: Variant = _raycast_collider()
 	if body == null:
 		return null
-	for child in (body as Node).get_children():
-		if is_instance_of(child, component_script):
-			return child
+	var queue: Array[Node] = [body as Node]
+	while not queue.is_empty():
+		var node: Node = queue.pop_front()
+		for child in node.get_children():
+			if is_instance_of(child, component_script):
+				return child
+			queue.append(child)
 	return null
 
 

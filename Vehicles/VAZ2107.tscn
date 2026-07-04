@@ -1,9 +1,10 @@
-[gd_scene load_steps=14 format=3]
+[gd_scene load_steps=15 format=3]
 
 [ext_resource type="Script" path="res://Vehicles/VehicleController.gd" id="1"]
 [ext_resource type="Script" path="res://Components/TowComponent.gd" id="2"]
 [ext_resource type="Script" path="res://Components/VehicleServicePoint.gd" id="3"]
 [ext_resource type="Script" path="res://Components/InteractableComponent.gd" id="4"]
+[ext_resource type="Script" path="res://Vehicles/VehicleSeat.gd" id="5"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_1"]
 size = Vector3(1.62, 1.45, 4.15)
@@ -145,6 +146,19 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.3, 2.15)
 [node name="TowComponent" type="Node3D" parent="."]
 script = ExtResource("2")
 hitch_point = NodePath("../HitchPoint")
+
+[node name="SpringArm3D" type="SpringArm3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.6, 0)
+spring_length = 5.0
+
+[node name="Camera3D" type="Camera3D" parent="SpringArm3D"]
+
+[node name="DriverSeat" type="Node" parent="."]
+script = ExtResource("5")
+
+[node name="InteractableComponent" type="Node" parent="DriverSeat"]
+script = ExtResource("4")
+prompt_text = "Enter vehicle"
 
 [node name="ServicePoint" type="Node" parent="."]
 script = ExtResource("3")
