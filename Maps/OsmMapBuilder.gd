@@ -28,8 +28,12 @@ func _ready() -> void:
 	var data: Dictionary = _load_data()
 	if data.is_empty():
 		return
-	_build_ground_zone("CityGround", data.get("city_bounds", {}), city_color)
-	_build_ground_zone("ForestGround", data.get("forest_bounds", {}), forest_color)
+	# The forest bounding box (any wood/forest-tagged way reaching this far)
+	# fully contains the city bounding box -- both zones are otherwise
+	# coplanar boxes, so the city zone is raised a hair above the forest
+	# one to render on top instead of z-fighting with it.
+	_build_ground_zone("ForestGround", data.get("forest_bounds", {}), forest_color, 0.0)
+	_build_ground_zone("CityGround", data.get("city_bounds", {}), city_color, 0.02)
 	_build_roads(data.get("roads", []))
 	_build_river(data.get("river_lines", []))
 
@@ -44,7 +48,9 @@ func _load_data() -> Dictionary:
 	return parsed if parsed is Dictionary else {}
 
 
-func _build_ground_zone(zone_name: String, bounds: Dictionary, color: Color) -> void:
+func _build_ground_zone(
+	zone_name: String, bounds: Dictionary, color: Color, top_offset: float = 0.0
+) -> void:
 	if bounds.is_empty():
 		return
 	var min_x: float = bounds["min_x"] - ground_padding
@@ -52,7 +58,9 @@ func _build_ground_zone(zone_name: String, bounds: Dictionary, color: Color) -> 
 	var min_z: float = bounds["min_z"] - ground_padding
 	var max_z: float = bounds["max_z"] + ground_padding
 	var size := Vector3(max_x - min_x, ground_thickness, max_z - min_z)
-	var center := Vector3((min_x + max_x) / 2.0, -ground_thickness / 2.0, (min_z + max_z) / 2.0)
+	var center := Vector3(
+		(min_x + max_x) / 2.0, top_offset - ground_thickness / 2.0, (min_z + max_z) / 2.0
+	)
 
 	var material := StandardMaterial3D.new()
 	material.albedo_color = color
