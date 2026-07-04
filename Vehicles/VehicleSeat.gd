@@ -30,6 +30,11 @@ func is_occupied() -> bool:
 	return _driver != null
 
 
+## Lets the driver's HUD read fuel/health off the vehicle it's actually seated in.
+func get_vehicle() -> VehicleController:
+	return _vehicle
+
+
 ## Called by the driver's own PlayerController when it presses interact
 ## while seated.
 func exit() -> void:

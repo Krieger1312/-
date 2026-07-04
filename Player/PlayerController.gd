@@ -9,14 +9,22 @@ extends CharacterBody3D
 const SPEED: float = 6.0
 const SPRINT_SPEED: float = 10.0
 const JUMP_VELOCITY: float = 7.5
+const PITCH_LIMIT: float = deg_to_rad(80.0)
 
 @export var interact_range: float = 3.0
 @export var interact_collision_mask: int = 1
+@export var mouse_sensitivity: float = 0.003
 
 ## The VehicleSeat currently riding us, or null when on foot. Set by
 ## VehicleSeat itself via enter_vehicle()/exit_vehicle() -- see there for
 ## why this isn't replicated to other peers yet.
-var current_seat: Node = null
+var current_seat: VehicleSeat = null
+
+## The InteractableComponent currently under our crosshair, or null. Updated
+## every physics frame on foot so the HUD can show an interaction prompt;
+## cleared while seated since there's nothing to raycast for from inside a
+## vehicle.
+var focused_interactable: InteractableComponent = null
 
 var _gravity: float = ProjectSettings.get_setting("physics/3d/default_gravity")
 
@@ -33,17 +41,42 @@ func _enter_tree() -> void:
 func _ready() -> void:
 	_camera.current = is_multiplayer_authority()
 	_grab_component.camera = _camera
+	if is_multiplayer_authority():
+		Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
+
+
+## Mouse-look: yaw turns the whole body (so movement/aim/facing all agree),
+## pitch only tilts the SpringArm3D so the model itself never tips over.
+## Without this the camera/interact raycast were both stuck dead-horizontal
+## at eye height, unable to aim at anything shorter (a parked car's roofline
+## sits below eye level) -- found by testing the seat/interact raycast at a
+## realistic standing distance instead of calling interact() directly.
+func _unhandled_input(event: InputEvent) -> void:
+	if not is_multiplayer_authority():
+		return
+	if event is InputEventMouseMotion:
+		rotate_y(-event.relative.x * mouse_sensitivity)
+		_spring_arm.rotation.x = clampf(
+			_spring_arm.rotation.x - event.relative.y * mouse_sensitivity, -PITCH_LIMIT, PITCH_LIMIT
+		)
+	elif event.is_action_pressed("ui_cancel"):
+		Input.mouse_mode = (
+			Input.MOUSE_MODE_VISIBLE
+			if Input.mouse_mode == Input.MOUSE_MODE_CAPTURED
+			else Input.MOUSE_MODE_CAPTURED
+		)
 
 
 ## Called by a VehicleSeat when we get in: hide, stop walking, and let the
 ## seat's own camera take over. Disabling our own collision matters here --
 ## a hidden-but-still-solid capsule left standing where the vehicle needs to
 ## move would just block it.
-func enter_vehicle(seat: Node) -> void:
+func enter_vehicle(seat: VehicleSeat) -> void:
 	current_seat = seat
 	visible = false
 	_collision_shape.disabled = true
 	_camera.current = false
+	_set_focused_interactable(null)
 
 
 ## Called by a VehicleSeat when we get out: reappear at `exit_position` and
@@ -85,8 +118,23 @@ func _physics_process(delta: float) -> void:
 
 	move_and_slide()
 
+	_set_focused_interactable(_find_component(InteractableComponent) as InteractableComponent)
+
 	if Input.is_action_just_pressed("interact"):
 		_handle_interact()
+
+
+## Tracks whichever InteractableComponent is under the crosshair so the HUD
+## can show its prompt_text; on_focus/on_unfocus fire so other systems (e.g.
+## a future highlight outline) can react the same way they would to interact().
+func _set_focused_interactable(interactable: InteractableComponent) -> void:
+	if interactable == focused_interactable:
+		return
+	if focused_interactable != null:
+		focused_interactable.unfocus(self)
+	focused_interactable = interactable
+	if focused_interactable != null:
+		focused_interactable.focus(self)
 
 
 ## Cargo-in-hand takes priority (drop into a slot if we're facing one),
@@ -133,11 +181,22 @@ func _find_component(component_script: Script) -> Node:
 	return null
 
 
+## Casts from the SpringArm3D's own (un-extended) anchor rather than the
+## Camera3D's tip -- the chase-cam arm pulls the camera several meters
+## behind and above the player whenever unobstructed (spring_length=4 here,
+## more on some vehicles), which put anything within interact_range of the
+## player's actual body entirely out of the ray's reach. Direction still
+## matches the camera exactly since nothing here ever rotates the camera
+## independently of the player body (no separate mouse-look pitch).
 func _raycast_collider() -> Variant:
 	var space_state: PhysicsDirectSpaceState3D = _camera.get_world_3d().direct_space_state
-	var from: Vector3 = _camera.global_position
-	var to: Vector3 = from - _camera.global_transform.basis.z * interact_range
+	var from: Vector3 = _spring_arm.global_position
+	var to: Vector3 = from - _spring_arm.global_transform.basis.z * interact_range
 	var query: PhysicsRayQueryParameters3D = PhysicsRayQueryParameters3D.create(from, to)
 	query.collision_mask = interact_collision_mask
+	# The SpringArm3D anchor sits on our own vertical centerline at eye
+	# height, inside our own capsule's top cap -- without this the ray can
+	# self-intersect and never reach past our own body.
+	query.exclude = [get_rid()]
 	var result: Dictionary = space_state.intersect_ray(query)
 	return result.get("collider")

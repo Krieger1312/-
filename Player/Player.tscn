@@ -1,7 +1,8 @@
-[gd_scene load_steps=6 format=3]
+[gd_scene load_steps=7 format=3]
 
 [ext_resource type="Script" path="res://Player/PlayerController.gd" id="1"]
 [ext_resource type="Script" path="res://Components/PhysicalGrabComponent.gd" id="2"]
+[ext_resource type="PackedScene" path="res://UI/Hud.tscn" id="3"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_1"]
 radius = 0.4
@@ -38,6 +39,8 @@ spring_length = 4.0
 
 [node name="PhysicalGrabComponent" type="Node3D" parent="."]
 script = ExtResource("2")
+
+[node name="Hud" parent="." instance=ExtResource("3")]
 
 [node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="."]
 replication_config = SubResource("SceneReplicationConfig_1")

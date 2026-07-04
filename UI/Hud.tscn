@@ -1,0 +1,34 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://UI/Hud.gd" id="1"]
+
+[node name="Hud" type="CanvasLayer"]
+script = ExtResource("1")
+
+[node name="Margin" type="MarginContainer" parent="."]
+offset_left = 16.0
+offset_top = 16.0
+offset_right = 336.0
+offset_bottom = 160.0
+
+[node name="VBox" type="VBoxContainer" parent="Margin"]
+layout_mode = 2
+
+[node name="MoneyLabel" type="Label" parent="Margin/VBox"]
+layout_mode = 2
+text = "$0"
+
+[node name="VehicleStats" type="VBoxContainer" parent="Margin/VBox"]
+layout_mode = 2
+
+[node name="FuelBar" type="ProgressBar" parent="Margin/VBox/VehicleStats"]
+layout_mode = 2
+show_percentage = false
+
+[node name="HealthBar" type="ProgressBar" parent="Margin/VBox/VehicleStats"]
+layout_mode = 2
+show_percentage = false
+
+[node name="PromptLabel" type="Label" parent="Margin/VBox"]
+layout_mode = 2
+text = ""
