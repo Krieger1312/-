@@ -1,0 +1,110 @@
+[gd_scene load_steps=8 format=3]
+
+[ext_resource type="Script" path="res://Vehicles/VehicleController.gd" id="1"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_1"]
+size = Vector3(0.7, 0.9, 1.9)
+
+[sub_resource type="BoxMesh" id="BoxMesh_1"]
+size = Vector3(0.7, 0.9, 1.9)
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_1"]
+top_radius = 0.22
+bottom_radius = 0.22
+height = 0.15
+
+[sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_1"]
+properties/0/path = NodePath(".:position")
+properties/0/spawn = true
+properties/0/replication_mode = 1
+properties/1/path = NodePath(".:rotation")
+properties/1/spawn = true
+properties/1/replication_mode = 1
+properties/2/path = NodePath(".:steering")
+properties/2/spawn = true
+properties/2/replication_mode = 1
+
+[node name="Vehicle" type="VehicleBody3D" groups=["Vehicles"]]
+mass = 130.0
+center_of_mass_mode = 1
+center_of_mass = Vector3(0, 0.2, 0)
+angular_damp = 7.485
+script = ExtResource("1")
+engine_power = 130.0
+steer_angle = 0.610865
+brake_power = 104.0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.45, 0)
+shape = SubResource("BoxShape3D_1")
+
+[node name="CarBody" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.45, 0)
+mesh = SubResource("BoxMesh_1")
+
+[node name="LF" type="VehicleWheel3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.1, 0.22, -0.65)
+use_as_steering = true
+wheel_roll_influence = 1.0
+wheel_radius = 0.22
+wheel_rest_length = 0.08
+wheel_friction_slip = 7.8
+suspension_travel = 0.4
+suspension_stiffness = 45.0
+damping_compression = 0.4
+damping_relaxation = 0.6
+
+[node name="Mesh" type="MeshInstance3D" parent="LF"]
+transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, 0, 0, 0)
+mesh = SubResource("CylinderMesh_1")
+
+[node name="RF" type="VehicleWheel3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.1, 0.22, -0.65)
+use_as_steering = true
+wheel_roll_influence = 1.0
+wheel_radius = 0.22
+wheel_rest_length = 0.08
+wheel_friction_slip = 7.8
+suspension_travel = 0.4
+suspension_stiffness = 45.0
+damping_compression = 0.4
+damping_relaxation = 0.6
+
+[node name="Mesh" type="MeshInstance3D" parent="RF"]
+transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, 0, 0, 0)
+mesh = SubResource("CylinderMesh_1")
+
+[node name="LB" type="VehicleWheel3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.1, 0.22, 0.65)
+use_as_traction = true
+wheel_roll_influence = 1.0
+wheel_radius = 0.22
+wheel_rest_length = 0.08
+wheel_friction_slip = 7.8
+suspension_travel = 0.4
+suspension_stiffness = 45.0
+damping_compression = 0.4
+damping_relaxation = 0.6
+
+[node name="Mesh" type="MeshInstance3D" parent="LB"]
+transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, 0, 0, 0)
+mesh = SubResource("CylinderMesh_1")
+
+[node name="RB" type="VehicleWheel3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.1, 0.22, 0.65)
+use_as_traction = true
+wheel_roll_influence = 1.0
+wheel_radius = 0.22
+wheel_rest_length = 0.08
+wheel_friction_slip = 7.8
+suspension_travel = 0.4
+suspension_stiffness = 45.0
+damping_compression = 0.4
+damping_relaxation = 0.6
+
+[node name="Mesh" type="MeshInstance3D" parent="RB"]
+transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, 0, 0, 0)
+mesh = SubResource("CylinderMesh_1")
+
+[node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="."]
+replication_config = SubResource("SceneReplicationConfig_1")
