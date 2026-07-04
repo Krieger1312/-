@@ -52,9 +52,10 @@ center_of_mass_mode = 1
 center_of_mass = Vector3(0, 0.3, 0)
 angular_damp = 7.485
 script = ExtResource("1")
-engine_power = 2200.0
+engine_power = 2400.0
 engine_response = 60.0
-brake_power = 1760.0
+brake_power = 150.0
+max_speed = 33.0
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0)

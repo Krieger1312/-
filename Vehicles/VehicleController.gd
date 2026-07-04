@@ -61,17 +61,27 @@ func _physics_process(delta: float) -> void:
 	if max_speed > 0.0 and current_speed >= max_speed:
 		throttle_input = minf(throttle_input, 0.0)
 	if current_speed > 0.0 and current_speed < low_speed_threshold:
-		throttle_input *= low_speed_threshold / current_speed
-	engine_force = lerp(engine_force, throttle_input * engine_power, engine_response * delta)
+		# Capped: uncapped, this blows up toward the near-zero speeds right
+		# off a standing start and destabilizes the lerp below (its weight
+		# can exceed 1 -- see that comment) into a multi-tick oscillation
+		# that briefly sends engine_force to absurd magnitudes.
+		throttle_input *= clampf(low_speed_threshold / current_speed, 1.0, 4.0)
+	# lerp()'s weight must stay within [0, 1]; engine_response * delta alone
+	# can exceed 1 (e.g. 100 * 1/60 = 1.67), which turns lerp into a
+	# diverging extrapolation instead of smoothing toward the target.
+	var engine_weight: float = clampf(engine_response * delta, 0.0, 1.0)
+	engine_force = lerp(engine_force, throttle_input * engine_power, engine_weight)
 
 	var steer_input: float = (
 		Input.get_action_strength("move_left") - Input.get_action_strength("move_right")
 	)
-	steering = lerp(steering, steer_input * steer_angle, steer_response * delta)
+	var steer_weight: float = clampf(steer_response * delta, 0.0, 1.0)
+	steering = lerp(steering, steer_input * steer_angle, steer_weight)
 
 	var brake_input: float = Input.get_action_strength("brake")
 	var brake_target: float = brake_power if brake_input > 0.0 else 0.0
-	brake = lerp(brake, brake_target, brake_response * delta)
+	var brake_weight: float = clampf(brake_response * delta, 0.0, 1.0)
+	brake = lerp(brake, brake_target, brake_weight)
 
 	_consume_fuel(delta)
 	_check_collision_damage(delta)
