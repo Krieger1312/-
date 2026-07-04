@@ -15,6 +15,10 @@ var _joint: PinJoint3D
 var _grabbed_body: RigidBody3D
 
 
+func _enter_tree() -> void:
+	set_multiplayer_authority(get_parent().get_multiplayer_authority())
+
+
 func _ready() -> void:
 	_anchor = StaticBody3D.new()
 	_anchor.top_level = true
@@ -22,7 +26,7 @@ func _ready() -> void:
 
 
 func _physics_process(_delta: float) -> void:
-	if _grabbed_body:
+	if _grabbed_body and is_multiplayer_authority():
 		_anchor.global_position = _hold_position()
 
 
@@ -31,11 +35,28 @@ func is_holding() -> bool:
 
 
 ## Grabs whatever the camera is looking at, or releases the held object.
+## Only the owning peer may act; the result is replicated to everyone.
 func toggle_grab() -> void:
+	if not is_multiplayer_authority():
+		return
 	if _grabbed_body:
-		drop()
+		request_drop.rpc()
 	else:
-		_try_grab()
+		var target: RigidBody3D = _raycast_target()
+		if target:
+			request_grab.rpc(target.get_path())
+
+
+@rpc("authority", "call_local", "reliable")
+func request_grab(body_path: NodePath) -> void:
+	var body: Node = get_node_or_null(body_path)
+	if body is RigidBody3D:
+		_grab(body)
+
+
+@rpc("authority", "call_local", "reliable")
+func request_drop() -> void:
+	drop()
 
 
 func drop() -> void:
@@ -45,9 +66,9 @@ func drop() -> void:
 	_grabbed_body = null
 
 
-func _try_grab() -> void:
+func _raycast_target() -> RigidBody3D:
 	if camera == null:
-		return
+		return null
 	var space_state: PhysicsDirectSpaceState3D = camera.get_world_3d().direct_space_state
 	var from: Vector3 = camera.global_position
 	var to: Vector3 = from - camera.global_transform.basis.z * grab_range
@@ -55,8 +76,7 @@ func _try_grab() -> void:
 	query.collision_mask = collision_mask
 	var result: Dictionary = space_state.intersect_ray(query)
 	var body: Variant = result.get("collider")
-	if body is RigidBody3D:
-		_grab(body)
+	return body if body is RigidBody3D else null
 
 
 func _grab(body: RigidBody3D) -> void:
