@@ -20,3 +20,7 @@ signal vehicle_out_of_fuel(vehicle: Node)
 signal vehicle_damaged(vehicle: Node, current_health: float)
 ## Emitted by VehicleController when its health reaches zero and it stops responding to input.
 signal vehicle_immobilized(vehicle: Node)
+## Emitted by QuestManager when a delivery's cargo reaches its dropoff.
+signal delivery_completed(cargo: Node, reward: int)
+## Emitted by QuestManager whenever the shared money pool changes.
+signal money_changed(amount: int)

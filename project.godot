@@ -18,6 +18,7 @@ config/features=PackedStringArray("4.3", "Forward Plus")
 EventBus="*res://Core/EventBus.gd"
 TimeServer="*res://Core/TimeServer.gd"
 SaveManager="*res://Core/SaveManager.gd"
+QuestManager="*res://Core/QuestManager.gd"
 NetworkManager="*res://Network/NetworkManager.gd"
 
 [input]
