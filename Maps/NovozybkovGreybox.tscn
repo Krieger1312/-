@@ -166,16 +166,16 @@ cargo = NodePath("../DeliveryCargo3")
 reward = 70
 
 [node name="PlayerSpawn" type="Node3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.7, 1, -46.4)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -894.9, 1, -1635.1)
 
 [node name="VAZ2107Spawn" type="Node3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -25, 1, -46.4)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -910.2, 1, -1635.1)
 
 [node name="FordTransitSpawn" type="Node3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, 1, -46.4)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -875.2, 1, -1635.1)
 
 [node name="StelsVortexSpawn" type="Node3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.7, 1, -30)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -894.9, 1, -1618.7)
 
 [node name="ElectricScooterSpawn" type="Node3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.7, 1, -62)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -894.9, 1, -1650.7)
