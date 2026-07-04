@@ -26,6 +26,13 @@ const PLAYER_SCENE: PackedScene = preload("res://Player/Player.tscn")
 
 func _ready() -> void:
 	EventBus.player_spawn_ready.connect(_on_player_spawn_ready)
+	# The host's own scooter assignment is rolled and broadcast the instant
+	# it calls host_game() -- from the main menu, well before this map (and
+	# this spawner) even exist -- so that first player_spawn_ready is
+	# already missed by the time we start listening. Catch up on whatever
+	# NetworkManager already knows.
+	for peer_id: int in NetworkManager.scooter_assignment:
+		_on_player_spawn_ready(peer_id, NetworkManager.scooter_assignment[peer_id])
 
 
 func _on_player_spawn_ready(peer_id: int, scooter_type: String) -> void:
