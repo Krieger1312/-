@@ -18,6 +18,10 @@ extends VehicleBody3D
 @export var brake_response: float = 16.0
 @export var low_speed_threshold: float = 10.0
 
+## Speed governor (m/s): cuts forward throttle once reached. 0 disables it
+## (unlimited top speed), which is the default for vehicles that don't need one.
+@export var max_speed: float = 0.0
+
 ## Fuel drains with engine load and cuts the throttle at zero; refilled via refuel().
 @export var fuel_capacity: float = 40.0
 @export var fuel_consumption_rate: float = 2.0
@@ -54,6 +58,8 @@ func _physics_process(delta: float) -> void:
 	if _is_immobilized or current_fuel <= 0.0:
 		throttle_input = 0.0
 	var current_speed: float = linear_velocity.length()
+	if max_speed > 0.0 and current_speed >= max_speed:
+		throttle_input = minf(throttle_input, 0.0)
 	if current_speed > 0.0 and current_speed < low_speed_threshold:
 		throttle_input *= low_speed_threshold / current_speed
 	engine_force = lerp(engine_force, throttle_input * engine_power, engine_response * delta)

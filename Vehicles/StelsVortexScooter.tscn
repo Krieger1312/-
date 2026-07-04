@@ -1,4 +1,4 @@
-[gd_scene load_steps=10 format=3]
+[gd_scene load_steps=13 format=3]
 
 [ext_resource type="Script" path="res://Vehicles/VehicleController.gd" id="1"]
 [ext_resource type="Script" path="res://Components/VehicleServicePoint.gd" id="2"]
@@ -7,8 +7,23 @@
 [sub_resource type="BoxShape3D" id="BoxShape3D_1"]
 size = Vector3(0.7, 0.9, 1.9)
 
-[sub_resource type="BoxMesh" id="BoxMesh_1"]
-size = Vector3(0.7, 0.9, 1.9)
+[sub_resource type="StandardMaterial3D" id="MatRed"]
+albedo_color = Color(0.55, 0.07, 0.07, 1.0)
+
+[sub_resource type="StandardMaterial3D" id="MatSeat"]
+albedo_color = Color(0.1, 0.1, 0.11, 1.0)
+
+[sub_resource type="BoxMesh" id="MeshChassis"]
+size = Vector3(0.6, 0.35, 1.5)
+material = SubResource("MatRed")
+
+[sub_resource type="BoxMesh" id="MeshSeat"]
+size = Vector3(0.55, 0.35, 0.7)
+material = SubResource("MatSeat")
+
+[sub_resource type="BoxMesh" id="MeshFairing"]
+size = Vector3(0.5, 0.55, 0.25)
+material = SubResource("MatRed")
 
 [sub_resource type="CylinderMesh" id="CylinderMesh_1"]
 top_radius = 0.22
@@ -40,9 +55,17 @@ brake_power = 104.0
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.45, 0)
 shape = SubResource("BoxShape3D_1")
 
-[node name="CarBody" type="MeshInstance3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.45, 0)
-mesh = SubResource("BoxMesh_1")
+[node name="Chassis" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.2, 0)
+mesh = SubResource("MeshChassis")
+
+[node name="Seat" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.55, 0.3)
+mesh = SubResource("MeshSeat")
+
+[node name="Fairing" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.55, -0.75)
+mesh = SubResource("MeshFairing")
 
 [node name="LF" type="VehicleWheel3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.1, 0.22, -0.65)

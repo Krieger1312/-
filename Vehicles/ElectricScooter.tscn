@@ -1,4 +1,4 @@
-[gd_scene load_steps=10 format=3]
+[gd_scene load_steps=11 format=3]
 
 [ext_resource type="Script" path="res://Vehicles/VehicleController.gd" id="1"]
 [ext_resource type="Script" path="res://Components/VehicleServicePoint.gd" id="2"]
@@ -7,8 +7,12 @@
 [sub_resource type="BoxShape3D" id="BoxShape3D_1"]
 size = Vector3(0.35, 1.0, 1.0)
 
+[sub_resource type="StandardMaterial3D" id="MatBody"]
+albedo_color = Color(0.14, 0.14, 0.15, 1.0)
+
 [sub_resource type="BoxMesh" id="BoxMesh_1"]
 size = Vector3(0.35, 1.0, 1.0)
+material = SubResource("MatBody")
 
 [sub_resource type="CylinderMesh" id="CylinderMesh_1"]
 top_radius = 0.09
@@ -35,6 +39,7 @@ script = ExtResource("1")
 engine_power = 90.0
 steer_angle = 0.523599
 brake_power = 72.0
+max_speed = 13.0
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
